@@ -10,23 +10,22 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-@WebServlet("/")
+@WebServlet("/files")
 public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getParameter("path");
-        if (path == null) {
+        if (path == null || path.isEmpty()) {
             path = folderPath();
-            resp.sendRedirect(req.getContextPath() + "/?path=" + path);
+            resp.sendRedirect(req.getContextPath() + req.getServletPath() + "?path=" + path);
+            return;
         }
-        req.setAttribute("URL", req.getContextPath() + "/?path=");
+        req.setAttribute("URL", req.getContextPath() + req.getServletPath() + "?path=");
         req.setAttribute("date", (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(new Date()));
-        String test = (new File(path)).getParent();
+        
         req.setAttribute("parentFolderPath", (new File(path)).getParent());
         req.setAttribute("folderPath", path);
 
@@ -43,6 +42,7 @@ public class MainServlet extends HttpServlet {
             }
         } else if (!file.exists()) {
             resp.sendError(404, "File or directory not found");
+            return;
         }
 
         req.getRequestDispatcher("mypage.jsp").forward(req, resp);
@@ -65,7 +65,7 @@ public class MainServlet extends HttpServlet {
         if (listFiles != null) {
             String[][] listInfoFiles = new String[listFiles.length][4];
             for (int i = 0; i < listFiles.length; i++) {
-                listInfoFiles[i][0] = listFiles[i].getCanonicalPath() + "\\";
+                listInfoFiles[i][0] = listFiles[i].getCanonicalPath() + File.separator;
                 listInfoFiles[i][1] = listFiles[i].getName();
                 if(listFiles[i].isFile()) {
                     listInfoFiles[i][2] = listFiles[i].length() + " B";
