@@ -1,4 +1,4 @@
-package com.rewqty.fileslab;
+package com.rewqty.fileslab.servlets;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

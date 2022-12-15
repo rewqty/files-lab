@@ -1,4 +1,6 @@
-package com.rewqty.fileslab;
+package com.rewqty.fileslab.servlets;
+
+import com.rewqty.fileslab.models.FileModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 @WebServlet("/files")
@@ -23,14 +26,14 @@ public class FileViewServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + req.getServletPath() + "?path=" + path);
             return;
         }
+
         req.setAttribute("URL", req.getContextPath() + req.getServletPath() + "?path=");
         req.setAttribute("date", (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(new Date()));
 
         req.setAttribute("parentFolderPath", (new File(path)).getParent());
         req.setAttribute("folderPath", path);
 
-        String[][] listInfoFiles = listInfoFiles(path);
-        req.setAttribute("files", listInfoFiles);
+        req.setAttribute("files", listInfoFiles(path));
 
         File file = new File(path);
         if (file.isFile()) {
@@ -38,7 +41,7 @@ public class FileViewServlet extends HttpServlet {
                 resp.addHeader("Content-Disposition", "attachment;filename=" + file.getName());
                 resp.addHeader("Content-Length", Long.toString(file.length()));
                 resp.setContentType("application/octet-stream");
-                out.write( Files.readAllBytes(file.toPath()));
+                out.write(Files.readAllBytes(file.toPath()));
             }
         } else if (!file.exists()) {
             resp.sendError(404, "File or directory not found");
@@ -58,19 +61,18 @@ public class FileViewServlet extends HttpServlet {
         return file.getCanonicalPath();
     }
     
-    private String[][] listInfoFiles(String pathDirectory) throws IOException {
+    private ArrayList<FileModel> listInfoFiles(String pathDirectory) throws IOException {
         File directory = new File(pathDirectory);
         File[] listFiles = directory.listFiles();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
         if (listFiles != null) {
-            String[][] listInfoFiles = new String[listFiles.length][4];
-            for (int i = 0; i < listFiles.length; i++) {
-                listInfoFiles[i][0] = listFiles[i].getCanonicalPath() + File.separator;
-                listInfoFiles[i][1] = listFiles[i].getName();
-                if(listFiles[i].isFile()) {
-                    listInfoFiles[i][2] = listFiles[i].length() + " B";
-                }
-                listInfoFiles[i][3] = dateFormat.format(listFiles[i].lastModified());
+            ArrayList<FileModel> listInfoFiles = new ArrayList<>();
+            for (File file : listFiles) {
+                listInfoFiles.add(new FileModel(
+                        file.getCanonicalPath() + File.separator,
+                        file.getName(),
+                        file.isFile() ? file.length() : -1,
+                        new Date(file.lastModified())));
             }
             return listInfoFiles;
         } else {
