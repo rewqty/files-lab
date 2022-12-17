@@ -1,6 +1,8 @@
 package com.rewqty.fileslab.servlets;
 
 import com.rewqty.fileslab.models.FileModel;
+import com.rewqty.fileslab.models.UserProfileModel;
+import com.rewqty.fileslab.services.AccountService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,6 +22,12 @@ public class FileViewServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        UserProfileModel userProfile = AccountService.getInstance().getUserBySessionId(req.getSession().getId());
+        if (userProfile == null) {
+            resp.sendRedirect(req.getContextPath() + "/auth");
+            return;
+        }
+
         String path = req.getParameter("path");
         if (path == null || path.isEmpty()) {
             path = folderPath();

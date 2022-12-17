@@ -3,10 +3,10 @@ package com.rewqty.fileslab.models;
 import java.util.Date;
 
 public class FileModel {
-    private String path;
-    private String name;
-    private Long size;
-    private Date dateLastModified;
+    private final String path;
+    private final String name;
+    private final Long size;
+    private final Date dateLastModified;
     public FileModel(String path, String name, Long size, Date lastModifiedDate) {
         this.path = path;
         this.name = name;

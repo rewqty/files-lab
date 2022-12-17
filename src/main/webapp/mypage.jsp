@@ -6,8 +6,17 @@
     <title>FileViewer</title>
 </head>
 <body>
-    ${date}
+    <div>
+        ${date}
+    </div>
+    <div>
+        <form action="auth?form=logout" method="post">
+            <input class="button" type="submit" value="Выйти"/>
+        </form>
+    </div>
+
     <h1>${folderPath}</h1>
+
     <p><a href="${URL}${parentFolderPath}">Вверх</a></p>
     <table>
         <tr><th>Файл</th><th>Размер</th><th>Дата изменения</th></tr>
