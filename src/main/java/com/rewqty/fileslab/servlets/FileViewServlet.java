@@ -30,31 +30,49 @@ public class FileViewServlet extends HttpServlet {
 
         String path = req.getParameter("path");
         if (path == null || path.isEmpty()) {
-            path = folderPath();
-            resp.sendRedirect(req.getContextPath() + req.getServletPath() + "?path=" + path);
+            String pathHomeUser = folderHomePath() + userProfile.getLogin();
+            File homeDir = new File(pathHomeUser);
+            if(!homeDir.exists()) {
+                Files.createDirectories(homeDir.toPath());
+            }
+            resp.sendRedirect(req.getContextPath() + req.getServletPath() + "?path=" + pathHomeUser);
+            return;
+        }
+
+        File file = new File(path);
+        if (file.isFile()) {
+            if(file.getCanonicalPath().contains(folderHomePath() + userProfile.getLogin())) {
+                try (OutputStream out = resp.getOutputStream()) {
+                    resp.addHeader("Content-Disposition", "attachment;filename=" + file.getName());
+                    resp.addHeader("Content-Length", Long.toString(file.length()));
+                    resp.setContentType("application/octet-stream");
+                    out.write(Files.readAllBytes(file.toPath()));
+                }
+            } else {
+                resp.sendError(403, "Forbidden. File access denied. Reason: File outside your home folder");
+                return;
+            }
+        } else if (!file.exists()) {
+            resp.sendError(404, "File or directory not found");
+            return;
+        } else if(!file.getCanonicalPath().contains(folderHomePath() + userProfile.getLogin())) {
+            resp.sendError(403, "Forbidden. Folder access denied. Reason: Folder outside your home folder");
             return;
         }
 
         req.setAttribute("URL", req.getContextPath() + req.getServletPath() + "?path=");
         req.setAttribute("date", (new SimpleDateFormat("dd-MM-yyyy HH:mm:ss")).format(new Date()));
 
-        req.setAttribute("parentFolderPath", (new File(path)).getParent());
         req.setAttribute("folderPath", path);
 
-        req.setAttribute("files", listInfoFiles(path));
-
-        File file = new File(path);
-        if (file.isFile()) {
-            try (OutputStream out = resp.getOutputStream()) {
-                resp.addHeader("Content-Disposition", "attachment;filename=" + file.getName());
-                resp.addHeader("Content-Length", Long.toString(file.length()));
-                resp.setContentType("application/octet-stream");
-                out.write(Files.readAllBytes(file.toPath()));
-            }
-        } else if (!file.exists()) {
-            resp.sendError(404, "File or directory not found");
-            return;
+        if(file.getCanonicalPath().equals(folderHomePath() + userProfile.getLogin())) {
+            req.setAttribute("isParentFolderPathVisible", false);
+        } else {
+            req.setAttribute("parentFolderPath", (new File(path)).getParent());
+            req.setAttribute("isParentFolderPathVisible", true);
         }
+
+        req.setAttribute("files", listInfoFiles(path));
 
         req.getRequestDispatcher("mypage.jsp").forward(req, resp);
     }
@@ -64,9 +82,9 @@ public class FileViewServlet extends HttpServlet {
         super.doPost(req, resp);
     }
 
-    private String folderPath() throws IOException {
+    private String folderHomePath() throws IOException {
         File file = new File(".");
-        return file.getCanonicalPath();
+        return file.getCanonicalPath() + File.separator + "home directory" + File.separator;
     }
     
     private ArrayList<FileModel> listInfoFiles(String pathDirectory) throws IOException {

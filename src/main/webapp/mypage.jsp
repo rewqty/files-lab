@@ -7,17 +7,18 @@
 </head>
 <body>
     <div>
-        ${date}
-    </div>
-    <div>
         <form action="auth?form=logout" method="post">
             <input class="button" type="submit" value="Выйти"/>
         </form>
     </div>
+    <div>
+        ${date}
+    </div>
 
     <h1>${folderPath}</h1>
-
-    <p><a href="${URL}${parentFolderPath}">Вверх</a></p>
+    <c:if test="${isParentFolderPathVisible == true}">
+        <p><a href="${URL}${parentFolderPath}">Вверх</a></p>
+    </c:if>
     <table>
         <tr><th>Файл</th><th>Размер</th><th>Дата изменения</th></tr>
         <c:forEach var="file" items="${files}">

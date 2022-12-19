@@ -24,9 +24,9 @@ public class AuthServlet extends HttpServlet {
         AccountService accountService = AccountService.getInstance();
         UserProfileModel profile = accountService.getUserBySessionId(req.getSession().getId());
         if (profile == null) {
-            if (action.equals("login")) {
+            if (action.equalsIgnoreCase("login")) {
                 req.getRequestDispatcher("login.jsp").forward(req, resp);
-            } else if (action.equals("registration")) {
+            } else if (action.equalsIgnoreCase("registration")) {
                 req.getRequestDispatcher("registration.jsp").forward(req, resp);
             }
         } else {
@@ -42,7 +42,7 @@ public class AuthServlet extends HttpServlet {
             action = "login";
         }
 
-        if (action.equals("logout")) {
+        if (action.equalsIgnoreCase("logout")) {
             accountService.deleteSession(req.getSession().getId());
             resp.sendRedirect(req.getContextPath() + "/auth");
             return;
@@ -52,7 +52,7 @@ public class AuthServlet extends HttpServlet {
         String email = req.getParameter("email");
         String pass = req.getParameter("password");
 
-        if (action.equals("registration")) {
+        if (action.equalsIgnoreCase("registration")) {
 
             if (login.equals("") || pass.equals("") || email.equals("")) {
                 req.getRequestDispatcher("registration.jsp").forward(req, resp);
