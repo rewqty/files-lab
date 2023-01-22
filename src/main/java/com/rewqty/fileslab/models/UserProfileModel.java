@@ -5,16 +5,10 @@ public class UserProfileModel {
     private final String pass;
     private final String email;
 
-    public UserProfileModel(String login, String pass, String email) {
+    public UserProfileModel(String login, String email, String pass) {
         this.login = login;
-        this.pass = pass;
         this.email = email;
-    }
-
-    public UserProfileModel(String login) {
-        this.login = login;
-        this.pass = login;
-        this.email = login;
+        this.pass = pass;
     }
 
     public String getLogin() {

@@ -7,8 +7,8 @@
 </head>
 <body>
     <div>
-        <form action="auth?form=logout" method="post">
-            <input class="button" type="submit" value="Выйти"/>
+        <form action="auth?action=logout" method="POST">
+            <input class="button" type="submit" value="Выйти" name="logout"/>
         </form>
     </div>
     <div>
