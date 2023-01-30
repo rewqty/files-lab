@@ -53,8 +53,12 @@ public class AuthServlet extends HttpServlet {
         String pass = req.getParameter("password");
 
         if (action.equalsIgnoreCase("registration")) {
+            boolean isLoginExist = accountService.loginExist(login);
+            boolean isEmailExist = accountService.emailExist(email);
 
-            if (login.equals("") || pass.equals("") || email.equals("")) {
+            if (login.equals("") || pass.equals("") || email.equals("") || isLoginExist || isEmailExist) {
+                req.setAttribute("isLoginAlreadyExist", isLoginExist);
+                req.setAttribute("isEmailAlreadyExist", isEmailExist);
                 req.getRequestDispatcher("registration.jsp").forward(req, resp);
                 return;
             }

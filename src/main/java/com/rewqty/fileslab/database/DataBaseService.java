@@ -71,15 +71,31 @@ public class DataBaseService {
     public static void createTable(Connection connection) {
         try {
             String query = "CREATE TABLE `users` (" +
-                    "`login` varchar(20) NOT NULL, " +
-                    "`email` varchar(254) NOT NULL, " +
-                    "`pass` varchar(100) NOT NULL, " +
-                    "CONSTRAINT UC_Account UNIQUE (login,email)" +
+                    "`Id` INT PRIMARY KEY AUTO_INCREMENT, " +
+                    "`login` varchar(20) NOT NULL UNIQUE, " +
+                    "`email` varchar(254) NOT NULL UNIQUE, " +
+                    "`pass` varchar(100) NOT NULL" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
             connection.createStatement().executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public boolean columnValueExist(String column, String value) {
+        try(ResultSet rs = getStatement().executeQuery(
+                String.format(
+                        "SELECT %s FROM users WHERE %s = '%s';", column, column, value))){
+            while(rs.next()) {
+                String tValue = rs.getString(column);
+                if (tValue != null) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
     public Statement getStatement() throws SQLException {
         return connection.createStatement();

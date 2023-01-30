@@ -51,24 +51,26 @@ public class AccountService {
             e.printStackTrace();
         }
     }
-
     public void addNewUser(UserProfileModel userProfile) {
         insertNewUser(userProfile.getLogin(), userProfile.getEmail(), userProfile.getPass());
         loginToProfile.put(userProfile.getLogin(), userProfile);
+    }
+    public boolean loginExist(String login) {
+        return _dataBaseService.columnValueExist("login", login);
+    }
+    public boolean emailExist(String email) {
+        return _dataBaseService.columnValueExist("email", email);
     }
 
     public UserProfileModel getUserByLogin(String login) {
         return loginToProfile.get(login);
     }
-
     public UserProfileModel getUserBySessionId(String sessionId) {
         return sessionIdToProfile.get(sessionId);
     }
-
     public void addSession(String sessionId, UserProfileModel userProfile) {
         sessionIdToProfile.put(sessionId, userProfile);
     }
-
     public void deleteSession(String sessionId) {
         sessionIdToProfile.remove(sessionId);
     }
