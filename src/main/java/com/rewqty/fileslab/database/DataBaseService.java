@@ -16,19 +16,13 @@ public class DataBaseService {
             url.
                     append("jdbc:mysql://").
                     append("localhost:").
-                    append("3306/");
+                    append("3306/").
+                    append("fileslab?").
+                    append("createDatabaseIfNotExist=true");
 
-            Connection mysqlConnection = DriverManager.getConnection(url.toString(), "admin", "admin");
-
-            if(!databaseExist(mysqlConnection, "fileslab")) {
-                String query = "CREATE database fileslab;";
-                mysqlConnection.createStatement().execute(query);
-            }
-
-            url.append("fileslab");
-
-            mysqlConnection.close();
             Connection connection = DriverManager.getConnection(url.toString(), "admin", "admin");
+
+
             if(!tableExist(connection, "users")) {
                 createTable(connection);
             }
@@ -38,20 +32,6 @@ public class DataBaseService {
             e.printStackTrace();
         }
         return null;
-    }
-    public static boolean databaseExist(Connection mysqlConnection, String dbName) {
-        try (ResultSet resultSet = mysqlConnection.getMetaData().getCatalogs()) {
-            while (resultSet.next()) {
-                // Get the database name, which is at position 1
-                String databaseName = resultSet.getString(1);
-                if (databaseName.equals(dbName)) {
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
     public static boolean tableExist(Connection dbConnection, String tableName) {
         try (ResultSet rs = dbConnection.getMetaData().getTables(null, null, tableName,
