@@ -62,7 +62,7 @@ public class AuthServlet extends HttpServlet {
                 req.getRequestDispatcher("registration.jsp").forward(req, resp);
                 return;
             }
-            UserProfileModel newProfile = new UserProfileModel(login, email, pass);
+            UserProfileModel newProfile = new UserProfileModel(null, login, email, pass);
             accountService.addNewUser(newProfile);
             accountService.addSession(req.getSession().getId(), newProfile);
 
